@@ -1,64 +1,50 @@
-MEAN CRUD Application – Docker, Nginx, Docker Compose & CI/CD Deployment
 Overview
 
-This project is a fully containerized MEAN (MongoDB, Express, Angular, Node.js) CRUD application deployed on an Ubuntu EC2 instance using Docker, Docker Compose, and Nginx. The repository also includes a CI/CD pipeline using GitHub Actions that builds and pushes Docker images to Docker Hub and deploys the updated application automatically to the EC2 server.
+This project is a fully containerized MEAN stack application that performs basic CRUD operations using MongoDB, Express.js, Angular, and Node.js. The application is deployed on an Ubuntu EC2 instance and served via Nginx reverse proxy on port 80. CI/CD is implemented using GitHub Actions to automate image building, pushing, and deployment on changes.
 
-This assignment demonstrates hands-on experience with containerization, cloud deployment, reverse proxy configuration, and automated CI/CD workflows.
+Architecture
+Components Used
 
-Project Architecture
-Browser → Nginx (Reverse Proxy) → Angular Frontend → Node.js Backend → MongoDB
+Frontend: Angular application
+
+Backend: Node.js + Express REST API
+
+Database: MongoDB (Docker container)
+
+Reverse Proxy: Nginx
+
+Infrastructure: Ubuntu EC2 instance
+
+Container Platform: Docker + Docker Compose
+
+CI/CD: GitHub Actions & Docker Hub registry
 
 
-Services involved:
+Architecture Diagram
+Developer → GitHub Repo → CI/CD → Docker Hub → EC2 → Docker Compose → Nginx → User
 
-Angular Frontend (Docker)
+Features
 
-Node.js Backend API (Docker)
+✔ Fully containerized MEAN application
+✔ Dockerfiles for frontend and backend
+✔ MongoDB containerized or native installation not required
+✔ Nginx reverse proxy (application served on port 80)
+✔ AWS EC2 deployment
+✔ CI/CD via GitHub Actions
+✔ Automatic Docker image build + push + deployment
+✔ Easy to scale or update
 
-MongoDB Database (Official Docker image)
 
-Nginx Reverse Proxy on port 80 (Docker)
+File & Folder Structure
+.
+├── backend/
+├── frontend/
+├── nginx/default.conf
+├── docker-compose.yml
+└── .github/workflows/cicd.yml
 
-Deployment on Ubuntu EC2
-
-CI/CD using GitHub Actions
-
-Technology Stack
-
-Angular
-
-Node.js / Express.js
-
-MongoDB
-
-Docker & Docker Compose
-
-Nginx
-
-AWS EC2 (Ubuntu 22.04)
-
-Docker Hub
-
-GitHub Actions CI/CD
-
-Repository Structure
-backend/
-frontend/
-nginx/
-docker-compose.yml
-.github/workflows/cicd.yml
-README.md
-
-Docker Images
-
-Both application components are containerized and available on Docker Hub:
-
-docker.io/biswajitop/mean-backend:latest
-docker.io/biswajitop/mean-frontend:latest
-
-Run Locally (Development or Testing)
-git clone <this-repo-url>
-cd <project-folder>
+Deployment Details
+1. Local Deployment
 docker compose up -d
 
 
@@ -66,80 +52,149 @@ Open in browser:
 
 http://localhost/
 
+2. Cloud Deployment (AWS EC2)
+Requirements
 
-Stop containers:
+Ubuntu 22.04 EC2 instance
 
-docker compose down
+Ports allowed:
 
-Cloud Deployment (Ubuntu EC2)
-1. Install Docker and Docker Compose
-sudo apt update -y
-sudo apt install -y ca-certificates curl gnupg git
+22/tcp for SSH
+
+80/tcp for HTTP
+
+Commands Used on EC2
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker ubuntu
+exit
 
 
-Re-login and verify:
+Clone the repository:
 
-docker --version
-docker compose version
-
-2. Clone the repo
-cd /opt
-sudo mkdir mean-app
-sudo chown ubuntu:ubuntu mean-app
-cd mean-app
-git clone <your-repo-url> .
-
-3. Deploy the stack
+git clone https://github.com/<username>/<repo>.git
+cd repo
 docker compose up -d
-docker ps
 
-4. Access Application
+Application Access
 http://<EC2_PUBLIC_IP>/
 
+CI/CD Workflow
 
-This exposes the entire UI over port 80 through Nginx.
+A GitHub Actions pipeline runs automatically on every commit pushed to main.
 
-Nginx Reverse Proxy Overview
+Pipeline stages:
 
-The container runs with a reverse proxy that routes traffic:
+Checkout latest source code
 
-/         → Angular frontend
-/api/     → Node.js backend
+Build Docker images for frontend and backend
 
+Push images to Docker Hub
 
-Example configuration:
+SSH into EC2
 
-location / {
-    proxy_pass http://frontend:4200;
-}
+Pull latest code and images
 
-location /api/ {
-    proxy_pass http://backend:8080;
-}
+Restart containers via Docker Compose
 
-CI/CD Pipeline (GitHub Actions)
+You only update code → the deployment updates automatically.
 
-This repository contains a GitHub Actions workflow that:
-
-Builds latest frontend and backend Docker images
-
-Pushes images to Docker Hub
-
-SSH into the EC2 instance
-
-Pulls latest images and restarts containers
-
-Required GitHub Secrets
-Name	Description
-DOCKERHUB_USERNAME	Docker Hub username
-DOCKERHUB_TOKEN	Docker Hub token or password
-SSH_HOST	EC2 public IP
-SSH_USER	SSH username (ubuntu)
-SSH_KEY	Private SSH key
-
-The CI/CD config file is located at:
+Pipeline file:
 
 .github/workflows/cicd.yml
+
+Docker Commands Used
+Build & Push images (handled automatically by CI/CD)
+docker build -t <user>/mean-backend:latest backend/
+docker build -t <user>/mean-frontend:latest frontend/
+docker push <user>/mean-backend:latest
+docker push <user>/mean-frontend:latest
+
+Nginx Reverse Proxy
+
+nginx/default.conf routes:
+
+/ → Angular frontend
+
+/api/ → Node backend
+
+Docker Compose Overview
+
+Services included:
+
+Angular frontend
+
+Node backend
+
+MongoDB
+
+Nginx reverse proxy
+
+Command to run:
+
+docker compose up -d
+
+Screenshots to Include (Important)
+
+Include the following screenshots in README:
+
+Infrastructure & Deployment
+
+EC2 running instance with public IP
+
+Terminal docker ps showing 4 containers running
+
+Application
+
+Application UI accessible from browser
+
+CRUD working demo (Create/Delete)
+
+CI/CD
+
+GitHub Actions pipeline run screen (success)
+
+Docker Hub repository page showing images pushed
+
+Docker
+
+Terminal showing docker compose up -d on EC2
+
+Nginx reverse proxy config screenshot (default.conf)
+
+Organize them under a section:
+
+Screenshots
+
+Add them like:
+
+<img width="1914" height="853" alt="Screenshot From 2025-11-28 19-06-53" src="https://github.com/user-attachments/assets/436149b3-c412-4e4e-aff5-c124ce149c2b" />
+
+<img width="1914" height="853" alt="Screenshot From 2025-11-28 19-07-21" src="https://github.com/user-attachments/assets/817f0350-60f7-415b-8586-3b7893fdc7e5" />
+
+...
+
+Optional Improvements
+
+HTTPS via Let’s Encrypt
+
+Autoscaling with ECS/Kubernetes
+
+Terraform infrastructure automation
+
+Multi-stage Angular production build
+
+Conclusion
+
+This project demonstrates:
+
+Docker containerization of a full-stack MEAN application,
+
+Deployment using Docker Compose and Nginx,
+
+Automated build and deployment pipeline using GitHub Actions,
+
+Hosting on AWS EC2 with scalable architecture.
+
+This setup satisfies typical DevOps requirements:
+containerization, orchestration, cloud deployment, and CI/CD.
